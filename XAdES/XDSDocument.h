@@ -18,7 +18,7 @@ static NSString *DateIdentifierKey = @"identifierKey";
 @property(nonatomic, strong) NSString *digestAlgorithm;
 @property(nonatomic, strong) NSString *signatureAlgorithm;
 @property(nonatomic, assign) id<XDSDocumentDelegate> delegate;
-
+@property(nonatomic, strong) NSString *pin;
 
 -(void)addData:(NSDictionary*)data;
 -(void)sign:(NSArray*)certs;
@@ -26,7 +26,6 @@ static NSString *DateIdentifierKey = @"identifierKey";
 @end
 
 @protocol XDSDocumentDelegate <NSObject>
-
--(NSData*)sign:(NSData*)toSign;
+-(NSData*)sign:(NSData*)toSign withPin:(NSString*)pin;
 
 @end

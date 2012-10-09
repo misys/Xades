@@ -27,6 +27,7 @@
 @synthesize signatureAlgorithm = _signatureAlgorithm;
 @synthesize datas = _datas;
 @synthesize references = _references;
+@synthesize pin;
 
 -(id)init {
     self = [super init];
@@ -222,13 +223,14 @@
     X509_NAME *name = X509_get_issuer_name(x509);
     char* x509Name = X509_NAME_oneline(name, NULL, 0);
     issuerName.content = [NSString stringWithFormat:@"%s", x509Name];
+  //  issuerName.content = @"SERIALNUMBER=201206, CN=Citizen CA, C=BE";
     [issuerElement addElement:issuerName];
     XDSElement *issuerSerial = [[XDSElement alloc] initWithName:@"X509SerialNumber" andNamespace:@"ds"];
     ASN1_INTEGER *serial = x509->cert_info->serialNumber;
     NSString *serialNumber = [self X509IntegerToNSString:serial];
     NSLog(@"%@", serialNumber);
     issuerSerial.content = serialNumber;
-  //  issuerSerial.content = @"21267647932559534548729785088889419001";
+   // issuerSerial.content = @"21267647932559534548729785088889419001";
     [issuerElement addElement:issuerSerial];
     [certElement addElement:issuerElement];
     [element addElement:certElement];
@@ -279,7 +281,7 @@
     NSString *time = [dateFormat stringFromDate:today];
     
     element.content = [NSString stringWithFormat:@"%@T%@+02:00", date, time];
-  //  element.content = @"2012-10-04T11:51:45+02:00";
+  //  element.content = @"2012-10-04T11:51:45";
     
     LOG_ELEMENT
     return element;
@@ -370,7 +372,7 @@
     XDSElement *signedInfo = [self createSignedInfo];
     NSData *hash = [[[signedInfo description] dataUsingEncoding:NSUTF8StringEncoding] SHA1Hash];
     NSLog(@"signed info hash %@", hash);
-    NSData *signature = [self.delegate sign:hash];
+    NSData *signature = [self.delegate sign:hash withPin:self.pin];
     NSString *signatureValue = [NSString base64Encode:signature];
 
     [element addElement:signedInfo];
